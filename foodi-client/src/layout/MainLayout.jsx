@@ -13,7 +13,7 @@ const MainLayout = () => {
             {
                 loading ? <LoadingSpinner/> :<div>
                     <Navbar/>
-                    <div className='min-h-screen bg-primaryBG'>
+                    <div className='min-h-screen'>
                         <Outlet/>
                     </div>
                     <Footer/>

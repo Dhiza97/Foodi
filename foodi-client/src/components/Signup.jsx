@@ -1,23 +1,28 @@
 import React, { useContext } from "react";
-import { useForm } from "react-hook-form";
-import { FaFacebookF, FaGithub, FaGoogle } from "react-icons/fa";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { FaFacebookF, FaGithub, FaGoogle, FaRegUser } from "react-icons/fa";
+import { useForm } from "react-hook-form";
 import Modal from "./Modal";
-import { AuthContext } from "../contexts/AuthProvider"; // Ensure this is the correct import path
+import { AuthContext } from "../contexts/AuthProvider";
+import axios from "axios";
+import useAxiosPublic from "../hooks/UseAxiosPublic";
 
 const Signup = () => {
+  const { signUpWithGmail, createUser, updateUserProfile } =
+    useContext(AuthContext);
+  const axiosPublic = useAxiosPublic();
+
+  // Redirecting to homepage or specific page
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const from = location.state?.from?.pathname || "/";
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-
-  const { createUser, login } = useContext(AuthContext); // Ensure AuthContext is being used correctly
-
-  // Redirecting to homepage or specific page
-  const location = useLocation();
-  const navigate = useNavigate();
-  const from = location.state?.from?.pathname || "/";
 
   const onSubmit = (data) => {
     const email = data.email;
@@ -26,15 +31,41 @@ const Signup = () => {
       .then((result) => {
         // Signed up
         const user = result.user;
-        alert("User created successfully");
-        document.getElementById("my_modal_5").close();
-        navigate(from, { replace: true });
+        updateUserProfile(data.email, data.photoURL).then(() => {
+          const userInfor = {
+            name: data.name,
+            email: data.email,
+          };
+          axiosPublic.post("/users", userInfor).then((response) => {
+            // console.log(response);
+            alert("Signin successful!");
+            navigate(from, { replace: true });
+          });
+        });
       })
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
-        console.error("Signup error:", errorCode, errorMessage);
+        // ..
       });
+  };
+
+  // login with google
+  const handleRegister = () => {
+    signUpWithGmail()
+      .then((result) => {
+        const user = result.user;
+        const userInfor = {
+          name: result?.user?.displayName,
+          email: result?.user?.email,
+        };
+        axiosPublic.post("/users", userInfor).then((response) => {
+          // console.log(response);
+          alert("Signin successful!");
+          navigate("/");
+        });
+      })
+      .catch((error) => console.log(error));
   };
 
   return (
@@ -46,8 +77,20 @@ const Signup = () => {
           method="dialog"
         >
           <h3 className="font-bold text-lg">Create An Account</h3>
+          {/* name */}
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text">Name</span>
+            </label>
+            <input
+              type="name"
+              placeholder="Your name"
+              className="input input-bordered"
+              {...register("name")}
+            />
+          </div>
 
-          {/* Email */}
+          {/* email */}
           <div className="form-control">
             <label className="label">
               <span className="label-text">Email</span>
@@ -55,13 +98,12 @@ const Signup = () => {
             <input
               type="email"
               placeholder="email"
-              className="input input-bordered bg-white"
-              {...register("email", { required: "Email is required" })}
+              className="input input-bordered"
+              {...register("email")}
             />
-            {errors.email && <p className="text-red-500">{errors.email.message}</p>}
           </div>
 
-          {/* Password */}
+          {/* password */}
           <div className="form-control">
             <label className="label">
               <span className="label-text">Password</span>
@@ -69,48 +111,40 @@ const Signup = () => {
             <input
               type="password"
               placeholder="password"
-              className="input input-bordered bg-white"
-              {...register("password", { required: "Password is required" })}
+              className="input input-bordered"
+              {...register("password")}
             />
-            {errors.password && <p className="text-red-500">{errors.password.message}</p>}
-            <label className="label mt-1">
-              <a href="#" className="label-text-alt link link-hover">
+            <label className="label">
+              <a href="#" className="label-text-alt link link-hover mt-2">
                 Forgot password?
               </a>
             </label>
           </div>
 
           {/* Error text */}
+          <p>{errors.message}</p>
 
-          {/* Login button */}
+          {/* submit btn */}
           <div className="form-control mt-6">
             <input
               type="submit"
-              className="btn bg-green border-none text-white"
-              value="Sign Up"
+              className="btn bg-green text-white"
+              value="Sign up"
             />
           </div>
-          <p className="text-center text-secondary my-2">
-            Have an account?{" "}
-            <button
-              className="underline text-red ml-1"
-              onClick={() => document.getElementById("my_modal_5").showModal()}
-            >
-              Login
-            </button>{" "}
-          </p>
 
-          <Link
-            to="/"
-            className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-          >
-            ✕
-          </Link>
+          <div className="text-center my-2">
+            Have an account?
+            <Link to="/login">
+              <button className="ml-2 underline">Login here</button>
+            </Link>
+          </div>
         </form>
 
         {/* Social sign in */}
         <div className="text-center space-x-3 mb-5">
-          <button className="btn btn-circle bg-gray-200 text-secondary hover:bg-green hover:text-white border-none">
+          <button className="btn btn-circle bg-gray-200 text-secondary hover:bg-green hover:text-white border-none"
+          onClick={handleRegister}>
             <FaGoogle />
           </button>
 
@@ -123,7 +157,6 @@ const Signup = () => {
           </button>
         </div>
       </div>
-      <Modal />
     </div>
   );
 };

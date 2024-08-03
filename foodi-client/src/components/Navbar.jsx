@@ -1,32 +1,30 @@
 import React, { useContext, useEffect, useState } from "react";
 import logo from "/logo.png";
-import { FaRegUser } from "react-icons/fa6";
+import { FaRegUser } from "react-icons/fa";
 import Modal from "./Modal";
-import { AuthContext } from "../contexts/AuthProvider";
 import Profile from "./Profile";
 import { Link } from "react-router-dom";
-import UseCart from "../hooks/UseCart";
+import useCart from "../hooks/UseCart";
+import useAuth from "../hooks/UseAuth";
 
 const Navbar = () => {
   const [isSticky, setSticky] = useState(false);
-
-  const { user } = useContext(AuthContext);
-  console.log(user);
-  const [cart, refetch] = UseCart();
-  console.log(cart);
+  const {user, loading} = useAuth();
+  const [cart, refetch] = useCart();
 
   // Handle scroll function
   useEffect(() => {
     const handleScroll = () => {
       const offset = window.scrollY;
-      const navbarHeight = document.querySelector(".navbar").clientHeight;
       if (offset > 0) {
         setSticky(true);
       } else {
         setSticky(false);
       }
     };
+
     window.addEventListener("scroll", handleScroll);
+
     return () => {
       window.addEventListener("scroll", handleScroll);
     };

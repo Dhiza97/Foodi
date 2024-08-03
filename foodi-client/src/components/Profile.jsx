@@ -1,19 +1,20 @@
 import React, { useContext } from "react";
 import { FaUser } from "react-icons/fa6";
 import { AuthContext } from "../contexts/AuthProvider";
+import { Link, useNavigate } from "react-router-dom";
 
 const Profile = ({ user }) => {
   const { logOut } = useContext(AuthContext);
+  const navigate = useNavigate()
 
   const handleLogout = () => {
     logOut()
       .then(() => {
         // Sign-out successful.
-        alert("Sign-out successful");
+        navigate("/")
       })
       .catch((error) => {
-        console.error("Error during sign-out:", error);
-        alert("An error occurred while signing out. Please try again.");
+        console.log(error);
       });
   };
 
@@ -52,6 +53,9 @@ const Profile = ({ user }) => {
             </li>
             <li>
               <a>Settings</a>
+            </li>
+            <li>
+              <Link to="/dashboard">Dashboard</Link>
             </li>
             <li>
               <a onClick={handleLogout}>Logout</a>

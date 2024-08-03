@@ -1,7 +1,9 @@
-import React, { createContext, useEffect, useState } from "react";
+/* eslint-disable react/prop-types */
+import React from "react";
+import { createContext } from "react";
 import {
-  createUserWithEmailAndPassword,
   GoogleAuthProvider,
+  createUserWithEmailAndPassword,
   getAuth,
   onAuthStateChanged,
   signInWithEmailAndPassword,
@@ -9,7 +11,10 @@ import {
   signOut,
   updateProfile,
 } from "firebase/auth";
+import { useState } from "react";
+import { useEffect } from "react";
 import app from "../firebase/firebase.config";
+import axios from "axios";
 
 // Create context
 export const AuthContext = createContext();
@@ -24,11 +29,13 @@ const AuthProvider = ({ children }) => {
 
   // Create an account
   const createUser = (email, password) => {
+    setLoading(true);
     return createUserWithEmailAndPassword(auth, email, password);
   };
 
   // Sign up with Gmail account
   const signUpWithGmail = () => {
+    setLoading(true);
     return signInWithPopup(auth, googleProvider);
   };
 
@@ -39,6 +46,7 @@ const AuthProvider = ({ children }) => {
 
   // Log out
   const logOut = () => {
+    localStorage.removeItem("genius-token");
     return signOut(auth);
   };
 
@@ -53,26 +61,39 @@ const AuthProvider = ({ children }) => {
   // Check signed In User
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      // console.log(currentUser);
       setUser(currentUser);
+      if (currentUser) {
+        const userInfo = { email: currentUser.email };
+        axios.post("http://localhost:6001/jwt", userInfo).then((response) => {
+          if (response.data.token) {
+            localStorage.setItem("access-token", response.data.token);
+          }
+        });
+      } else {
+        localStorage.removeItem("access-token");
+      }
+
       setLoading(false);
     });
-    return () => unsubscribe();
+
+    return () => {
+      return unsubscribe();
+    };
   }, []);
 
   const authInfo = {
     user,
+    loading,
     createUser,
-    signUpWithGmail,
     login,
     logOut,
+    signUpWithGmail,
     updateUserProfile,
-    loading,
   };
 
   return (
-    <AuthContext.Provider value={authInfo}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={authInfo}>{children}</AuthContext.Provider>
   );
 };
 

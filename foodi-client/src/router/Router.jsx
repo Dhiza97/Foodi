@@ -8,8 +8,8 @@ import UserProfile from "../pages/dashboard/UserProfile";
 import CartPage from "../pages/shop/CartPage";
 import Login from "../components/Login";
 import DashboardLayout from "../layout/DashboardLayout";
-// import Dashboard from "../pages/dashboard/admin/Dashboard";
-// import Users from "../pages/dashboard/admin/Users";
+import AdminDashboard from "../pages/dashboard/admin/AdminDashboard";
+import Users from "../pages/dashboard/admin/Users";
 // import AddMenu from "../pages/dashboard/admin/AddMenu";
 // import ManageItems from "../pages/dashboard/admin/ManageItems";
 // import UpdateMenu from "../pages/dashboard/admin/UpdateMenu";
@@ -54,14 +54,14 @@ const router = createBrowserRouter([
       path: 'dashboard',
       element: <PrivateRoute><DashboardLayout/></PrivateRoute>,
       children: [
-        // {
-        //   path: '',
-        //   element: <Dashboard/>
-        // },
-        // {
-        //   path: 'users', 
-        //   element: <Users/>
-        // },
+        {
+          path: '',
+          element: <AdminDashboard/>
+        },
+        {
+          path: 'users', 
+          element: <Users/>
+        },
         // {
         //   path: 'add-menu',
         //   element: <AddMenu/>

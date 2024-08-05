@@ -69,7 +69,7 @@ const Signup = () => {
   };
 
   return (
-    <div className="max-w-md bg-white shadow w-full mx-auto flex items-center justify-center my-20">
+    <div className="max-w-md bg-white shadow w-full mx-auto flex items-center justify-center py-24">
       <div className="modal-action flex flex-col justify-center mt-0 text-black">
         <form
           onSubmit={handleSubmit(onSubmit)}
@@ -85,7 +85,7 @@ const Signup = () => {
             <input
               type="name"
               placeholder="Your name"
-              className="input input-bordered"
+              className="input input-bordered bg-white"
               {...register("name")}
             />
           </div>
@@ -98,7 +98,7 @@ const Signup = () => {
             <input
               type="email"
               placeholder="email"
-              className="input input-bordered"
+              className="input input-bordered bg-white"
               {...register("email")}
             />
           </div>
@@ -111,7 +111,7 @@ const Signup = () => {
             <input
               type="password"
               placeholder="password"
-              className="input input-bordered"
+              className="input input-bordered bg-white"
               {...register("password")}
             />
             <label className="label">
@@ -128,7 +128,7 @@ const Signup = () => {
           <div className="form-control mt-6">
             <input
               type="submit"
-              className="btn bg-green text-white"
+              className="btn bg-green text-white border-none"
               value="Sign up"
             />
           </div>
